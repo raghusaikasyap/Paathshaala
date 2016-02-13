@@ -12,6 +12,7 @@ namespace Paathshaala_SPA
     {
         public void Configuration(IAppBuilder app)
         {
+            LoggingExtensions.Logging.Log.InitializeWith<LoggingExtensions.log4net.Log4NetLog>();
             ConfigureAuth(app);
         }
     }
