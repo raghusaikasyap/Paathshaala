@@ -48,7 +48,7 @@ namespace Paathshaala_SPA.Models
         }
     }
 
-    public class Teacher : IdentityUser
+    public class Teacher : ApplicationUser
     {
         public string TeacherID { get; set; }
         public string Name { get; set; }
@@ -68,12 +68,30 @@ namespace Paathshaala_SPA.Models
         }
     }
 
-    public class Principal : IdentityUser
+    public class School : ApplicationUser
     {
-        public string Name { get; set; }
+        public string NameOfSchool { get; set; }
         public string SchoolID { get; set; }
-        public string AadhaarID { get; set; }
         public string Address { get; set; }
+        public DateTime YearOfEstablishment { get; set; }
+        public string SchoolPhone { get; set; }
+
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<School> manager)
+        {
+            // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
+            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+            // Add custom user claims here
+            return userIdentity;
+        }
+    }
+
+    public class Principal : School
+    {
+        public string PrincipalName { get; set; }
+        public string PrincipalID { get; set; }
+        //public string SchoolID { get; set; }
+        public string AadhaarID { get; set; }
+        public string PrincipalAddress { get; set; }
         public DateTime YearOfJoining { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<Principal> manager)
@@ -84,6 +102,7 @@ namespace Paathshaala_SPA.Models
             return userIdentity;
         }
     }
+
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
@@ -95,5 +114,7 @@ namespace Paathshaala_SPA.Models
         {
             return new ApplicationDbContext();
         }
+
+        public System.Data.Entity.DbSet<Paathshaala_SPA.Models.Principal> Principals { get; set; }
     }
 }

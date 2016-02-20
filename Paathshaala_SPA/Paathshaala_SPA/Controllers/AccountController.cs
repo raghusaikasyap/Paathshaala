@@ -171,9 +171,9 @@ namespace Paathshaala_SPA.Controllers
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                     string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                     await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -181,6 +181,42 @@ namespace Paathshaala_SPA.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+
+        //
+        // GET: /Account/RegisterSchool
+        [AllowAnonymous]
+        public ActionResult RegisterSchool()
+        {
+            return View(new RegisterSchoolViewModel());
+        }
+
+        //
+        //POST: /Account/RegisterSchool
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RegisterSchool(RegisterSchoolViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var principal = new Principal { PrincipalName = model.PrincipalName, AadhaarID = model.AadhaarID, YearOfJoining = model.YearOfJoining, PrincipalAddress = model.PrincipalAddress, Email = model.Email, PhoneNumber = model.PhoneNumber, NameOfSchool = model.NameOfSchool, Address = model.Address, YearOfEstablishment = model.YearOfEstablishment, SchoolPhone = model.SchoolPhone };
+                var result = await UserManager.CreateAsync(principal, model.Password);
+                if (result.Succeeded)
+                {
+                    await SignInManager.SignInAsync(principal, isPersistent: false, rememberBrowser: false);
+
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
+                    // Send an email with this link
+                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(principal.Id);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = principal.Id, code = code }, protocol: Request.Url.Scheme);
+                    await UserManager.SendEmailAsync(principal.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+                    return RedirectToAction("Index", "Home");
+                }
+            }
             return View(model);
         }
 
